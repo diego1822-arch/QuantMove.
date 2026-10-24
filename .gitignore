@@ -9,3 +9,5 @@ venv/
 !.env.example
 *.log
 .DS_Store
+.venv312/
+.idea/
