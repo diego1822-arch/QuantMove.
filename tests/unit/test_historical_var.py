@@ -1,10 +1,7 @@
-import sys
 
 import numpy as np
 import pandas as pd
 import pytest
-
-sys.path.insert(0, "/content/QuantMove/src")
 
 from quantmove.risk.historical_var import (
     calculate_historical_var_es,
@@ -163,3 +160,47 @@ def test_expected_shortfall_with_fractional_tail_observation():
         result["expected_shortfall"], 0.40 / 1.5
     )
     assert result["expected_shortfall"] >= result["var"]
+def test_var_and_es_are_negative_when_all_returns_are_positive():
+    returns = pd.DataFrame({
+        "A": [0.10, 0.08, 0.05, 0.02]
+    })
+
+    result = calculate_historical_var_es(
+        returns,
+        {"A": 1.0},
+        confidence=0.75,
+    )
+
+    assert result["var"] == pytest.approx(-0.0425)
+    assert result["expected_shortfall"] == pytest.approx(-0.02)
+
+
+def test_var_and_es_equal_constant_negative_loss():
+    returns = pd.DataFrame({
+        "A": [0.02, 0.02, 0.02, 0.02]
+    })
+
+    result = calculate_historical_var_es(
+        returns,
+        {"A": 1.0},
+        confidence=0.75,
+    )
+
+    assert result["var"] == pytest.approx(-0.02)
+    assert result["expected_shortfall"] == pytest.approx(-0.02)
+
+
+def test_historical_var_es_with_short_position():
+    returns = pd.DataFrame({
+        "A": [0.10, -0.05, 0.04, -0.02],
+        "B": [-0.08, 0.06, -0.03, 0.05],
+    })
+
+    result = calculate_historical_var_es(
+        returns,
+        {"A": 1.5, "B": -0.5},
+        confidence=0.75,
+    )
+
+    assert result["var"] == pytest.approx(0.0675)
+    assert result["expected_shortfall"] == pytest.approx(0.105)
