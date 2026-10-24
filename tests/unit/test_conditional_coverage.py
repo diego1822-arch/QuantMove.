@@ -89,3 +89,15 @@ def test_conditional_coverage_validates_significance_level():
             [0, 1, 0, 1],
             significance_level=0,
         )
+
+
+def test_conditional_coverage_with_no_exceptions():
+    result = christoffersen_conditional_coverage_test(
+        [0] * 100,
+        confidence=0.95,
+    )
+
+    assert result["n_exceptions"] == 0
+    assert result["independence_identifiable"] is False
+    assert np.isfinite(result["lr_statistic"])
+    assert 0 <= result["p_value"] <= 1
