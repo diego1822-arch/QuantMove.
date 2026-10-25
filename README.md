@@ -2,43 +2,83 @@
 
 Motor cuantitativo de valoración y gestión de riesgos de portafolios.
 
+QuantMove integra herramientas para analizar rendimientos, estimar el riesgo de portafolios y evaluar modelos de riesgo mediante backtesting.
+
 ## Funcionalidades
 
 - Validación de datos de precios.
-- Descarga de precios ajustados con yfinance.
-- Estadísticas de rendimientos, correlación y volatilidad.
-- Estimación histórica de VaR y Expected Shortfall (ES).
+- Descarga de precios ajustados mediante Yahoo Finance.
+- Estadísticas de rendimientos y correlación.
+- Cálculo de volatilidad del portafolio.
+- Estimación histórica de Value at Risk (VaR) y Expected Shortfall (ES).
 - Simulación de riesgo mediante Monte Carlo.
 - Comparación de estimadores de riesgo.
-- Backtesting y pruebas estadísticas de cobertura.
-- Suite de pruebas automatizadas con pytest.
+- Backtesting y pruebas estadísticas de cobertura e independencia.
+- Pruebas automatizadas con pytest.
+- Demo reproducible con datos sintéticos, sin conexión a internet.
 
 ## Requisitos
 
-Python y las dependencias indicadas en los archivos de requisitos.
-Se necesita internet para descargar datos de mercado.
+- Python 3.12 o una versión compatible con `pyproject.toml`.
+- Dependencias indicadas en los archivos de requisitos.
+- Conexión a internet para descargar datos de mercado.
 
 ## Instalación
 
 Desde la raíz del proyecto, ejecuta:
 
 ```bash
-pip install -r requirements-dev.txt
+python -m pip install -r requirements-dev.txt
 ```
 
+## Demo reproducible
+
+QuantMove incluye una demostración que utiliza precios sintéticos de dos activos. No descarga datos de mercado y utiliza una semilla fija para facilitar la reproducción de los resultados.
+
+Ejecuta desde la raíz del proyecto:
+
+```bash
+python scripts/demo_quantmove.py
+```
+
+La demo muestra:
+
+- Número de observaciones de precios y rendimientos.
+- Volatilidad del portafolio.
+- VaR y Expected Shortfall históricos.
+- Comparación con las estimaciones de Monte Carlo.
+- Excepciones VaR y diagnósticos de backtesting.
+
+Las métricas de riesgo se presentan como porcentajes de rendimiento por período de observación; no representan cantidades monetarias.
+
+Los datos son sintéticos y los resultados son ilustrativos. Esta demostración permite comprobar el funcionamiento integrado del pipeline, pero no demuestra por sí sola la precisión del modelo con datos financieros reales.
+
+No rechazar una hipótesis estadística en una prueba de backtesting no demuestra que el modelo sea correcto. Los resultados deben interpretarse considerando el tamaño de la muestra y los supuestos de cada prueba.
+
 ## Ejecutar las pruebas
+
+Desde la raíz del proyecto:
 
 ```bash
 python -m pytest -q
 ```
 
-## Ejemplo de uso
+## Ejemplo con datos de mercado
+
+El siguiente ejemplo descarga precios ajustados de Apple (AAPL) y Microsoft (MSFT) y ejecuta el pipeline de riesgo. Requiere conexión a internet.
 
 ```python
 from quantmove.data.market_data import download_adjusted_close
-from quantmove.portfolio.historical_risk_pipeline import run_historical_risk_pipeline
+from quantmove.portfolio.historical_risk_pipeline import (
+    run_historical_risk_pipeline,
+)
 
-prices = download_adjusted_close(tickers=["AAPL", "MSFT"], period="1y", interval="1d")
+prices = download_adjusted_close(
+    tickers=["AAPL", "MSFT"],
+    period="1y",
+    interval="1d",
+)
+
 weights = {"AAPL": 0.50, "MSFT": 0.50}
 
 result = run_historical_risk_pipeline(
@@ -55,17 +95,15 @@ print(result["historical_var_es"])
 print(result["backtest_report"])
 ```
 
-El ejemplo requiere conexión a internet. Los resultados dependen
-de los datos obtenidos y de los parámetros utilizados.
+Los resultados dependen de los datos descargados y de los parámetros utilizados. Los datos de mercado pueden cambiar entre ejecuciones.
 
 ## Estructura del proyecto
 
-- `configs/`: configuraciones.
-- `docs/`: documentación.
-- `scripts/`: scripts auxiliares.
-- `src/quantmove/`: código fuente.
+- `scripts/`: demostraciones y utilidades.
+- `src/quantmove/`: código fuente del paquete.
 - `tests/`: pruebas automatizadas.
 - `pytest.ini`: configuración de pytest.
+- `pyproject.toml`: metadatos y configuración del paquete.
 - `requirements.txt`: dependencias de ejecución.
 - `requirements-dev.txt`: dependencias de desarrollo y pruebas.
 
@@ -75,5 +113,4 @@ En desarrollo. Las interfaces y la documentación pueden cambiar.
 
 ## Aviso
 
-QuantMove es una herramienta de análisis cuantitativo en desarrollo.
-No constituye asesoramiento financiero ni garantiza resultados futuros.
+QuantMove es una herramienta de análisis cuantitativo en desarrollo. No constituye asesoramiento financiero ni garantiza resultados futuros.
