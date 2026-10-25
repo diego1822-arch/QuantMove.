@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="QM.png" alt="QuantMove" width="100%">
+  <img src="QMLogo.png" alt="QuantMove" width="100%">
 </p>
 
 # QuantMove
