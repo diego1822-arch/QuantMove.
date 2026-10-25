@@ -28,7 +28,7 @@ QuantMove integra herramientas para analizar rendimientos, estimar el riesgo de 
 Desde la raíz del proyecto, ejecuta:
 
 ```bash
-python -m pip install -r requirements-dev.txt
+python -m pip install -e ".[dev]"
 ```
 
 ## Demo reproducible
