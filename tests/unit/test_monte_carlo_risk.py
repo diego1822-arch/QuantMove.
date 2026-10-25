@@ -166,3 +166,72 @@ def test_rejects_invalid_random_state():
         simulate_correlated_returns(
             historical, n_simulations=10, random_state="42"
         )
+
+
+def test_monte_carlo_var_matches_normal_theoretical_reference():
+    from scipy.stats import norm
+
+    historical_returns = np.array([
+        [-0.03],
+        [-0.02],
+        [-0.01],
+        [0.00],
+        [0.01],
+        [0.02],
+        [0.03],
+    ])
+
+    mean = historical_returns.mean()
+    volatility = historical_returns.std(ddof=1)
+
+    result = calculate_monte_carlo_var_es(
+        historical_returns,
+        weights=[1.0],
+        confidence=0.95,
+        n_simulations=200_000,
+        random_state=42,
+    )
+
+    theoretical_var = -mean + volatility * norm.ppf(0.95)
+
+    assert result["var"] == pytest.approx(
+        theoretical_var,
+        abs=0.0002,
+    )
+
+
+def test_monte_carlo_es_matches_normal_theoretical_reference():
+    from scipy.stats import norm
+
+    historical_returns = np.array([
+        [-0.03],
+        [-0.02],
+        [-0.01],
+        [0.00],
+        [0.01],
+        [0.02],
+        [0.03],
+    ])
+
+    mean = historical_returns.mean()
+    volatility = historical_returns.std(ddof=1)
+    confidence = 0.95
+
+    result = calculate_monte_carlo_var_es(
+        historical_returns,
+        weights=[1.0],
+        confidence=confidence,
+        n_simulations=200_000,
+        random_state=42,
+    )
+
+    z = norm.ppf(confidence)
+    theoretical_es = (
+        -mean
+        + volatility * norm.pdf(z) / (1 - confidence)
+    )
+
+    assert result["expected_shortfall"] == pytest.approx(
+        theoretical_es,
+        abs=0.0003,
+    )
