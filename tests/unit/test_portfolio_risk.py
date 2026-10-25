@@ -114,3 +114,19 @@ def test_rejects_only_one_observation():
         calculate_portfolio_volatility(
             returns, {"A": 1.0}
         )
+
+
+def test_identical_asset_returns_preserve_portfolio_volatility():
+    returns = pd.DataFrame({
+        "A": [0.01, 0.03, -0.02, 0.04],
+        "B": [0.01, 0.03, -0.02, 0.04],
+    })
+
+    result = calculate_portfolio_volatility(
+        returns,
+        {"A": 0.6, "B": 0.4},
+    )
+
+    expected = float(np.std(returns["A"].to_numpy(), ddof=1))
+
+    assert result == pytest.approx(expected, abs=1e-12)
