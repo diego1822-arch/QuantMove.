@@ -94,3 +94,23 @@ def test_independence_test_flags_sequence_with_only_exceptions():
     result = christoffersen_independence_test([1] * 100)
 
     assert result["independence_identifiable"] is False
+
+
+def test_independence_statistic_matches_independent_reference():
+    exceptions = [0, 0, 0, 1, 1, 1, 0, 0, 1, 0]
+
+    result = christoffersen_independence_test(exceptions)
+
+    assert result["n_00"] == 3
+    assert result["n_01"] == 2
+    assert result["n_10"] == 2
+    assert result["n_11"] == 2
+
+    assert result["lr_statistic"] == pytest.approx(
+        0.090014264180,
+        abs=1e-10,
+    )
+    assert result["p_value"] == pytest.approx(
+        0.764159022457,
+        abs=1e-10,
+    )
