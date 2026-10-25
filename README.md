@@ -1,3 +1,7 @@
+ <p align="center">
+  <img src="logo.png" alt="QuantMove Logo" width="220">
+</p>
+
 # QuantMove
 
 Motor cuantitativo de valoración y gestión de riesgos de portafolios.
