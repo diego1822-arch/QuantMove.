@@ -147,3 +147,28 @@ def test_pipeline_accepts_valid_integer_parameters():
     assert result["metadata"]["backtest_status"] == (
         "skipped_insufficient_history"
     )
+
+
+def test_pipeline_is_reproducible_with_fixed_random_state():
+    kwargs = {
+        "prices": make_prices(90),
+        "weights": {"ASSET_A": 0.6, "ASSET_B": 0.4},
+        "window_size": 30,
+        "n_simulations": 1000,
+        "random_state": 42,
+    }
+
+    first = run_historical_risk_pipeline(**kwargs)
+    second = run_historical_risk_pipeline(**kwargs)
+
+    for section in ("historical", "monte_carlo"):
+        for metric in ("var", "expected_shortfall"):
+            assert (
+                first["estimator_comparison"][section][metric]
+                == second["estimator_comparison"][section][metric]
+            )
+
+    assert (
+        first["portfolio_volatility"]
+        == second["portfolio_volatility"]
+    )
